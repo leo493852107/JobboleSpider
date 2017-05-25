@@ -6,8 +6,9 @@ from scrapy.http import Request
 import re
 import datetime
 from urllib import parse
+from scrapy.loader import ItemLoader
 
-from JobboleSpider.items import JobboleArticleItem
+from JobboleSpider.items import JobboleArticleItem, ArticleItemLoader
 from JobboleSpider.utils.common import get_md5
 
 
@@ -57,44 +58,61 @@ class JobboleSpider(scrapy.Spider):
         # tag_list = [element for element in tag_list if not element.strip().endswith("评论")]
         # tags = ','.join(tag_list)
 
-        article_item = JobboleArticleItem()
-        # 通过css选择器选取元素
+        # article_item = JobboleArticleItem()
+        # # 通过css选择器选取元素
+        # front_image_url = response.meta.get("front_image_url", "")  # 文章封面图
+        # title = response.css(".entry-header h1::text").extract_first("")    # 标题
+        # create_date = response.css("p.entry-meta-hide-on-mobile::text").extract_first("").strip().replace("·","").strip()   #发布时间
+        # thumb_up_num = int(response.css(".vote-post-up h10::text").extract_first(""))   # 点赞数
+        # bookmark_num = response.css(".bookmark-btn::text").extract_first("")    # 收藏数
+        # match_result = re.match(".*?(\d+).*", bookmark_num)
+        # if match_result:
+        #     bookmark_num = int(match_result.group(1))
+        # else:
+        #     bookmark_num = 0
+        # comment_num = response.css("a[href='#article-comment'] span::text").extract_first("")   #评论数
+        # match_result = re.match(".*?(\d+).*", comment_num)
+        # if match_result:
+        #     comment_num = int(match_result.group(1))
+        # else:
+        #     comment_num = 0
+        # content = response.css("div.entry").extract()   # 内容
+        # tag_list = response.css("p.entry-meta-hide-on-mobile a::text").extract()
+        # tag_list = [element for element in tag_list if not element.strip().endswith("评论")]
+        # tags = ','.join(tag_list)   #   标签
+        #
+        #
+        # article_item["url_obj_id"] = get_md5(response.url)
+        # article_item["title"] = title
+        # article_item["url"] = response.url
+        # try:
+        #     create_date = datetime.datetime.strptime(create_date, "%Y/%m/%d").date()
+        # except Exception as e:
+        #     create_date = datetime.datetime.now().date()
+        # article_item["create_date"] = create_date
+        # article_item["front_image_url"] = [front_image_url]
+        # article_item["thumb_up_num"] = thumb_up_num
+        # article_item["bookmark_num"] = bookmark_num
+        # article_item["comment_num"] = comment_num
+        # article_item["content"] = content
+        # article_item["tags"] = tags
+
+        # 通过 ItemLoader 加载item
         front_image_url = response.meta.get("front_image_url", "")  # 文章封面图
-        title = response.css(".entry-header h1::text").extract_first("")    # 标题
-        create_date = response.css("p.entry-meta-hide-on-mobile::text").extract_first("").strip().replace("·","").strip()   #发布时间
-        thumb_up_num = int(response.css(".vote-post-up h10::text").extract_first(""))   # 点赞数
-        bookmark_num = response.css(".bookmark-btn::text").extract_first("")    # 收藏数
-        match_result = re.match(".*?(\d+).*", bookmark_num)
-        if match_result:
-            bookmark_num = int(match_result.group(1))
-        else:
-            bookmark_num = 0
-        comment_num = response.css("a[href='#article-comment'] span::text").extract_first("")   #评论数
-        match_result = re.match(".*?(\d+).*", comment_num)
-        if match_result:
-            comment_num = int(match_result.group(1))
-        else:
-            comment_num = 0
-        content = response.css("div.entry").extract()   # 内容
-        tag_list = response.css("p.entry-meta-hide-on-mobile a::text").extract()
-        tag_list = [element for element in tag_list if not element.strip().endswith("评论")]
-        tags = ','.join(tag_list)   #   标签
+        # item_loader = ItemLoader(item=JobboleArticleItem(), response=response)
+        item_loader = ArticleItemLoader(item=JobboleArticleItem(), response=response)
+        item_loader.add_css("title", ".entry-header h1::text")
+        item_loader.add_value("url", response.url)
+        item_loader.add_value("url_obj_id", get_md5(response.url))
+        item_loader.add_css("create_date", "p.entry-meta-hide-on-mobile::text")
+        item_loader.add_value("front_image_url", [front_image_url])
+        item_loader.add_css("thumb_up_num", ".vote-post-up h10::text")
+        item_loader.add_css("bookmark_num", ".bookmark-btn::text")
+        item_loader.add_css("comment_num", "a[href='#article-comment'] span::text")
+        item_loader.add_css("tags", "p.entry-meta-hide-on-mobile a::text")
+        item_loader.add_css("content", "div.entry")
 
-
-        article_item["url_obj_id"] = get_md5(response.url)
-        article_item["title"] = title
-        article_item["url"] = response.url
-        try:
-            create_date = datetime.datetime.strptime(create_date, "%Y/%m/%d").date()
-        except Exception as e:
-            create_date = datetime.datetime.now().date()
-        article_item["create_date"] = create_date
-        article_item["front_image_url"] = [front_image_url]
-        article_item["thumb_up_num"] = thumb_up_num
-        article_item["bookmark_num"] = bookmark_num
-        article_item["comment_num"] = comment_num
-        article_item["content"] = content
-        article_item["tags"] = tags
+        article_item = item_loader.load_item()
 
         yield article_item
 

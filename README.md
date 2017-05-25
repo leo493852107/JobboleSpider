@@ -6,6 +6,7 @@
 > * 2.design article item
 > * 3.use pipeline to filter data
 > * 4.install MySQLdb, insert data into mysql database with sync(original)/async(Twisted) method.
+> * 5.use ItemLoader, rewrite ItemLoader, create some rule functions to make code beauty.
 
 
 ### 注意的地方
