@@ -9,6 +9,8 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
+import os
+
 BOT_NAME = 'JobboleSpider'
 
 SPIDER_MODULES = ['JobboleSpider.spiders']
@@ -64,9 +66,29 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'JobboleSpider.pipelines.JobbolespiderPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   # 'JobboleSpider.pipelines.JobbolespiderPipeline': 300,
+    # 'scrapy.pipelines.images.ImagesPipeline': 1,    # 默认优先顺序 越小越早
+
+   # 'JobboleSpider.pipelines.ArticleImagePipeline': 1,
+   # 'JobboleSpider.pipelines.JSONWidthEncodingPipeline': 2,
+   # 'JobboleSpider.pipelines.JSONExporterPipeline': 2,
+
+   # 'JobboleSpider.pipelines.MysqlPipeline': 3,
+   'JobboleSpider.pipelines.MysqlTwistedPipeline': 3,
+
+}
+
+# 设置下载字段
+IMAGES_URLS_FIELD = "front_image_url"
+
+# 设置保存路径
+project_dir = os.path.abspath(os.path.dirname(__file__))
+IMAGES_STORE = os.path.join(project_dir, 'images')
+
+# 根据图片大小过滤
+# IMAGES_MIN_WIDTH = 100
+# IMAGES_MIN_HEIGHT = 100
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -88,3 +110,10 @@ ROBOTSTXT_OBEY = False
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
+MYSQL_HOST = "localhost"
+MYSQL_DBNAME = "jobbolespider"
+MYSQL_USER = "root"
+MYSQL_PASSWORD = ""
+
