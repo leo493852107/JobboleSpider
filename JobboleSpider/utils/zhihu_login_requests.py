@@ -128,6 +128,5 @@ def zhihu_login(account, password):
 
 isLogin()
 
-# zhihu_login("leo493852107@163.com", "testabc123")
 
 
