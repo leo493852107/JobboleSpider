@@ -1,6 +1,6 @@
 # JobboleSpider
 
-
+## 本项目使用 python3
 ### 入门
 > * 1.use xpath or css selector to get data from html,
 > * 2.design article item

@@ -35,8 +35,8 @@ ROBOTSTXT_OBEY = False
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED = True
-COOKIES_DEBUG=True
+# 对于不用登陆的网站的爬取，需要设置为False，对于需要登陆的网站，如知乎，则就在代码中去动态设置为True
+COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
