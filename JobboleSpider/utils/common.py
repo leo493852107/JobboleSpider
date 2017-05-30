@@ -23,5 +23,9 @@ def extract_num(value):
     return nums
 
 
+def lagou_date_convert(value):
+    return value.split(' ')[0].strip()
+
+
 if __name__ == '__main__':
     print(get_md5("http://jobbole.com".encode("utf-8")))

@@ -14,11 +14,14 @@ from scrapy import Selector
 from scrapy.loader import ItemLoader
 
 from JobboleSpider.items import ZhihuQuestionItem, ZhihuAnswerItem
+from JobboleSpider.settings import USER_AGENT_LIST
+
 
 import re
 import time
 import json
 import datetime
+import random
 
 from urllib import parse
 
@@ -36,10 +39,12 @@ class ZhihuSpider(scrapy.Spider):
 
     start_answer_url = "https://www.zhihu.com/api/v4/questions/{0}/answers?include=data%5B*%5D.is_normal%2Cis_collapsed%2Ccollapse_reason%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Cmark_infos%2Ccreated_time%2Cupdated_time%2Crelationship.is_authorized%2Cis_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cupvoted_followees%3Bdata%5B*%5D.author.follower_count%2Cbadge%5B%3F(type%3Dbest_answerer)%5D.topics&limit={1}offset={2}"
 
+    random_index = random.randint(0, len(USER_AGENT_LIST)-1)
+    random_agent = USER_AGENT_LIST[random_index]
     headers = {
         "Host": "www.zhihu.com",
         "Referer": "https://www.zhihu.com",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+        "User-Agent": random_agent
     }
 
     custom_settings = {
@@ -67,7 +72,9 @@ class ZhihuSpider(scrapy.Spider):
         question_id = int(response.meta.get("question_id", ""))
         item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
         item_loader.add_css("title", ".QuestionHeader-title::text")
-        item_loader.add_css("content", ".QuestionHeader-detail span::text")
+        # item_loader.add_css("content", ".QuestionHeader-detail span::text")
+        # 有些只有标题没有内容，先用标题替代内容
+        item_loader.add_xpath("content", '//*[@class="QuestionHeader-detail"]/div/div/span/text()|//*[@class="QuestionHeader-main"]/h1/text()')
         item_loader.add_value("url", response.url)
         item_loader.add_value("zhihu_id", question_id)
         item_loader.add_css("answer_num", ".List-headerText span::text")
