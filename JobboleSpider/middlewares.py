@@ -8,6 +8,8 @@
 from scrapy import signals
 from fake_useragent import UserAgent
 
+from JobboleSpider.tools.IPManager import IPManager
+
 
 class JobbolespiderSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -75,5 +77,13 @@ class RandomUserAgentMiddleware(object):
             return getattr(self.ua, self.ua_type)   #相当于下面的 self.ua.self.ua_type
 
         request.headers.setdefault('User-Agent', get_ua())
+        # request.headers.meta("proxy", "http://175.155.24.24:808")
+
+
+class RandomProxyMiddleware(object):
+    # 动态设置ip代理
+    def process_request(self, request, spider):
+        manager = IPManager()
+        request.meta["proxy"] = manager.get_random_ip()
 
 

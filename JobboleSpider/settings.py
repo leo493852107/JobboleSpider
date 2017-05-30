@@ -58,6 +58,7 @@ COOKIES_ENABLED = False
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
    'JobboleSpider.middlewares.RandomUserAgentMiddleware': 543,
+   'JobboleSpider.middlewares.RandomProxyMiddleware': 555,
    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
 
