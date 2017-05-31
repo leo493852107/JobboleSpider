@@ -2,10 +2,12 @@
 import scrapy
 
 from scrapy.http import Request
+from selenium import webdriver
 
-import re
-import datetime
+import os
 from urllib import parse
+from scrapy.xlib.pydispatch import dispatcher
+from scrapy import signals
 from scrapy.loader import ItemLoader
 
 from JobboleSpider.items import JobboleArticleItem, ArticleItemLoader
@@ -17,13 +19,23 @@ class JobboleSpider(scrapy.Spider):
     allowed_domains = ['blog.jobbole.com']
     start_urls = ['http://blog.jobbole.com/all-posts/']
 
+    def __init__(self):
+        chromedriver_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "tools/chromedriver")
+        self.browser = webdriver.Chrome(executable_path=chromedriver_path)
+        super(JobboleSpider, self).__init__()
+        dispatcher.connect(self.spider_closed_exit_chrome, signals.spider_closed)
+
+    def spider_closed_exit_chrome(self, spider):
+        # 当爬虫退出的时候退出chrome
+        print("spider closed")
+        self.browser.quit()
+
     def parse(self, response):
         '''
         1. 获取文章列表页中的文章url并交给scrapy下载后进行解析
         2. 获取下一页的url并交给scrapy进行下载, 下载完成后交给parse
 
         '''
-
         post_nodes = response.css("#archive .floated-thumb .post-thumb a")
         for post_node in post_nodes:
             image_url = post_node.css("img::attr(src)").extract_first("")

@@ -59,6 +59,7 @@ COOKIES_ENABLED = False
 DOWNLOADER_MIDDLEWARES = {
    'JobboleSpider.middlewares.RandomUserAgentMiddleware': 543,
    'JobboleSpider.middlewares.RandomProxyMiddleware': 555,
+   'JobboleSpider.middlewares.JSPageMiddleware': 55,
    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
 

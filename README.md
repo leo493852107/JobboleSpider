@@ -17,6 +17,16 @@
 > * `ocr.py`是之前大神写的识别学校emis学生登录二维码用的，简单识别几位数字
 > * 在`lagou.py`中使用`custom_settings`限制了爬虫访问的间隔时间`"DOWNLOAD_DELAY": 3`
 ，貌似不会302了
+> * 动态获取网页有很多种形式，推荐使用chrome，比较稳定
+> * [`scrapy` 暂停和重启](https://doc.scrapy.org/en/latest/topics/jobs.html)
+>
+```python
+scrapy crawl lagou -s JOBDIR=crawl_status_info/001
+```
+将爬取的信息保存在`crawl_status_info`文件夹下，如果要另外爬取可以放在002目录下
+
+> *
+
 
 ### 参考
 > * [知乎模拟登陆参考](https://github.com/xchaoinfo/fuck-login)

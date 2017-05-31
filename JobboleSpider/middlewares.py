@@ -7,6 +7,9 @@
 
 from scrapy import signals
 from fake_useragent import UserAgent
+from scrapy.http import HtmlResponse
+
+import time
 
 from JobboleSpider.tools.IPManager import IPManager
 
@@ -85,5 +88,17 @@ class RandomProxyMiddleware(object):
     def process_request(self, request, spider):
         manager = IPManager()
         request.meta["proxy"] = manager.get_random_ip()
+
+
+class JSPageMiddleware(object):
+    # 通过chrome请求动态网页
+    def process_request(self, request, spider):
+        if spider.name == "jobbole":
+            spider.browser.get(request.url)
+            time.sleep(3)
+            print("访问:{0}".format(request.url))
+
+            return HtmlResponse(url=spider.browser.current_url, body=spider.browser.page_source, encoding="utf-8", request=request)
+
 
 
