@@ -56,12 +56,12 @@ COOKIES_ENABLED = False
 
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
-DOWNLOADER_MIDDLEWARES = {
-   'JobboleSpider.middlewares.RandomUserAgentMiddleware': 543,
-   'JobboleSpider.middlewares.RandomProxyMiddleware': 555,
-   'JobboleSpider.middlewares.JSPageMiddleware': 55,
-   'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
-}
+# DOWNLOADER_MIDDLEWARES = {
+#    'JobboleSpider.middlewares.RandomUserAgentMiddleware': 543,
+#    'JobboleSpider.middlewares.RandomProxyMiddleware': 555,
+#    'JobboleSpider.middlewares.JSPageMiddleware': 55,
+#    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+# }
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html

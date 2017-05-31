@@ -17,18 +17,25 @@ from JobboleSpider.utils.common import get_md5
 class JobboleSpider(scrapy.Spider):
     name = 'jobbole'
     allowed_domains = ['blog.jobbole.com']
-    start_urls = ['http://blog.jobbole.com/all-posts/']
+    start_urls = ['http://blog.jobbole.com/all-postss/']
+
+    # def __init__(self):
+    #     chromedriver_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "tools/chromedriver")
+    #     self.browser = webdriver.Chrome(executable_path=chromedriver_path)
+    #     super(JobboleSpider, self).__init__()
+    #     dispatcher.connect(self.spider_closed_exit_chrome, signals.spider_closed)
+    #
+    # def spider_closed_exit_chrome(self, spider):
+    #     # 当爬虫退出的时候退出chrome
+    #     print("spider closed")
+    #     self.browser.quit()
+
+    # 收集伯乐在线所有的404,301url和404,301页面数
+    handle_httpstatus_list = [404, 301]
 
     def __init__(self):
-        chromedriver_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "tools/chromedriver")
-        self.browser = webdriver.Chrome(executable_path=chromedriver_path)
-        super(JobboleSpider, self).__init__()
-        dispatcher.connect(self.spider_closed_exit_chrome, signals.spider_closed)
+        self.fail_urls = []
 
-    def spider_closed_exit_chrome(self, spider):
-        # 当爬虫退出的时候退出chrome
-        print("spider closed")
-        self.browser.quit()
 
     def parse(self, response):
         '''
@@ -36,6 +43,10 @@ class JobboleSpider(scrapy.Spider):
         2. 获取下一页的url并交给scrapy进行下载, 下载完成后交给parse
 
         '''
+        if response.status == 404 or response.status == 301:
+            self.fail_urls.append(response.url)
+            self.crawler.stats.inc_value("failed_url")
+
         post_nodes = response.css("#archive .floated-thumb .post-thumb a")
         for post_node in post_nodes:
             image_url = post_node.css("img::attr(src)").extract_first("")
