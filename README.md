@@ -26,6 +26,7 @@ scrapy crawl lagou -s JOBDIR=crawl_status_info/001
 将爬取的信息保存在`crawl_status_info`文件夹下，如果要另外爬取可以放在002目录下
 
 > * 数据收集[`Stats Collection`](https://doc.scrapy.org/en/latest/topics/stats.html#topics-stats)
+> * 信号处理[`Signals`](https://doc.scrapy.org/en/latest/topics/signals.html?highlight=signal)
 
 
 

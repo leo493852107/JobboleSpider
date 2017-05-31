@@ -33,9 +33,15 @@ class JobboleSpider(scrapy.Spider):
     # 收集伯乐在线所有的404,301url和404,301页面数
     handle_httpstatus_list = [404, 301]
 
+
     def __init__(self):
         self.fail_urls = []
+        dispatcher.connect(self.handle_spider_closed, signals.spider_closed)
 
+
+    def handle_spider_closed(self, spider, reason):
+        self.crawler.stats.set_value("failed_urls", ",".join(self.fail_urls))
+        pass
 
     def parse(self, response):
         '''
