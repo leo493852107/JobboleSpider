@@ -80,8 +80,8 @@ ITEM_PIPELINES = {
    # 'JobboleSpider.pipelines.JSONExporterPipeline': 2,
 
    # 'JobboleSpider.pipelines.MysqlPipeline': 3,
-   'JobboleSpider.pipelines.MysqlTwistedPipeline': 3,
-
+   # 'JobboleSpider.pipelines.MysqlTwistedPipeline': 3,
+   'JobboleSpider.pipelines.ElasticsearchPipeline': 1
 }
 
 # 设置下载字段

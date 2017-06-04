@@ -17,7 +17,7 @@ import time
 # browser.close()
 
 
-# chromedriver_path = os.path.join(os.path.dirname(__file__), "chromedriver")
+chromedriver_path = os.path.join(os.path.dirname(__file__), "chromedriver")
 
 
 # 5.设置 chromedriver 不加载图片
@@ -28,7 +28,7 @@ import time
 # browser.get("https://www.taobao.com/")
 
 
-# browser = webdriver.Chrome(executable_path=chromedriver_path)
+browser = webdriver.Chrome(executable_path=chromedriver_path)
 
 # 4.模拟下拉操作
 # browser.get("https://www.oschina.net/blog")
@@ -51,10 +51,10 @@ import time
 
 
 # 2.模拟登陆知乎
-# browser.get("https://www.zhihu.com/#signin")
-# browser.find_element_by_css_selector('.view-signin input[name="account"]').send_keys("18395960706")
-# browser.find_element_by_css_selector('.view-signin input[name="password"]').send_keys("testabc123")
-# browser.find_element_by_css_selector('.view-signin .sign-button').click()
+browser.get("https://www.zhihu.com/#signin")
+browser.find_element_by_css_selector('.view-signin input[name="account"]').send_keys("18395960706")
+browser.find_element_by_css_selector('.view-signin input[name="password"]').send_keys("testabc123")
+browser.find_element_by_css_selector('.view-signin .sign-button').click()
 
 
 

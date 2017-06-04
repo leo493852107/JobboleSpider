@@ -28,6 +28,7 @@ scrapy crawl lagou -s JOBDIR=crawl_status_info/001
 > * 数据收集[`Stats Collection`](https://doc.scrapy.org/en/latest/topics/stats.html#topics-stats)
 > * 信号处理[`Signals`](https://doc.scrapy.org/en/latest/topics/signals.html?highlight=signal)
 
+> * 先运行一下`es_types.py`，创建 Kibana 中 jobbole 数据结构
 
 
 ### 参考

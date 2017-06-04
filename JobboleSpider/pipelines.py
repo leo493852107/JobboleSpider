@@ -117,3 +117,13 @@ class ArticleImagePipeline(ImagesPipeline):
             item["front_image_path"] = image_file_path
 
         return item
+
+
+class ElasticsearchPipeline(object):
+    # 数据写入到es(elasticsearch)中
+    def process_item(self, item, spider):
+        # 将item转换为es的数据
+        item.save_to_es()
+
+        return item
+

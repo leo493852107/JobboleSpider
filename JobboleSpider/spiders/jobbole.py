@@ -6,9 +6,9 @@ from selenium import webdriver
 
 import os
 from urllib import parse
-from scrapy.xlib.pydispatch import dispatcher
-from scrapy import signals
-from scrapy.loader import ItemLoader
+# from scrapy.xlib.pydispatch import dispatcher
+# from scrapy import signals
+# from scrapy.loader import ItemLoader
 
 from JobboleSpider.items import JobboleArticleItem, ArticleItemLoader
 from JobboleSpider.utils.common import get_md5
@@ -17,7 +17,7 @@ from JobboleSpider.utils.common import get_md5
 class JobboleSpider(scrapy.Spider):
     name = 'jobbole'
     allowed_domains = ['blog.jobbole.com']
-    start_urls = ['http://blog.jobbole.com/all-postss/']
+    start_urls = ['http://blog.jobbole.com/all-posts/']
 
     # def __init__(self):
     #     chromedriver_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "tools/chromedriver")
@@ -31,17 +31,22 @@ class JobboleSpider(scrapy.Spider):
     #     self.browser.quit()
 
     # 收集伯乐在线所有的404,301url和404,301页面数
-    handle_httpstatus_list = [404, 301]
+    # handle_httpstatus_list = [404, 301]
 
 
-    def __init__(self):
-        self.fail_urls = []
-        dispatcher.connect(self.handle_spider_closed, signals.spider_closed)
+    # def __init__(self):
+    #     self.fail_urls = []
+    #     dispatcher.connect(self.handle_spider_closed, signals.spider_closed)
+    #
+    #
+    # def handle_spider_closed(self, spider, reason):
+    #     self.crawler.stats.set_value("failed_urls", ",".join(self.fail_urls))
+    #     pass
 
+    custom_settings = {
+        "DOWNLOAD_DELAY": 3
+    }
 
-    def handle_spider_closed(self, spider, reason):
-        self.crawler.stats.set_value("failed_urls", ",".join(self.fail_urls))
-        pass
 
     def parse(self, response):
         '''

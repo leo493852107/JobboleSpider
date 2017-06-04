@@ -11,11 +11,21 @@ from scrapy.loader.processors import MapCompose, TakeFirst, Join
 
 from w3lib.html import remove_tags
 
+import redis
+
 import datetime
 
 from JobboleSpider.utils.common import extract_num, lagou_date_convert
 from JobboleSpider.settings import SQL_DATE_FORMAT, SQL_DATETIME_FORMAT
+from JobboleSpider.models.es_types import ArticleType
+
 import re
+
+from elasticsearch_dsl.connections import connections
+es = connections.create_connection(ArticleType._doc_type.using) # 连接到es的用法
+
+
+redis_client = redis.StrictRedis(host="lcoalhost")
 
 
 class JobbolespiderItem(scrapy.Item):
@@ -54,6 +64,25 @@ def return_value(value):
     return value
 
 
+def gen_suggests(index, info_tuple):
+    # 根据字符串生成搜索建议数组
+    used_words = set()
+    suggests = []
+    for text, weight in info_tuple:
+        if text:
+            # 调用es的analyze接口分析字符串
+            words = es.indices.analyze(index=index, analyzer="ik_max_word", params={'filter': ["lowercase"]}, body=text)
+            analyzed_words = set([r["token"] for r in words["tokens"] if len(r["token"])>1])
+            new_words = analyzed_words - used_words
+        else:
+            new_words = set()
+
+        if new_words:
+            suggests.append({"input": list(new_words), "weight": weight})
+
+    return suggests
+
+
 class ArticleItemLoader(ItemLoader):
     # 自定义itemLoader
     default_output_processor = TakeFirst()
@@ -87,12 +116,40 @@ class JobboleArticleItem(scrapy.Item):
 
     def get_insert_sql(self):
         insert_sql = """
-            INSERT INTO jobbole_article(title, url, create_date, thumb_up_num)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO jobbole_article(title, url, create_date, thumb_up_num, bookmark_num,
+            comment_num, content, tags)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE thumb_up_num=VALUES(thumb_up_num), bookmark_num=VALUES(bookmark_num),
+            comment_num=VALUES(comment_num)
         """
-        params = (self["title"], self["url"], self["create_date"], self["thumb_up_num"])
+        params = (self["title"], self["url"], self["create_date"],
+                  self["thumb_up_num"], self["bookmark_num"], self["comment_num"],
+                  self["content"], self["tags"])
 
         return insert_sql, params
+
+    def save_to_es(self):
+        article = ArticleType()
+        article.title = self['title']
+        article.create_date = self['create_date']
+        article.content = remove_tags(self['content'])
+        article.front_image_url = self["front_image_url"]
+        if "front_image_path" in self:
+            article.front_image_path = self["front_image_path"]
+        article.thumb_up_num = self["thumb_up_num"]
+        article.bookmark_num = self["bookmark_num"]
+        article.comment_num = self["comment_num"]
+        article.url = self["url"]
+        article.tags = self["tags"]
+        article.meta.id = self["url_obj_id"]
+
+        article.suggest = gen_suggests(ArticleType._doc_type.index, ((article.title, 10), (article.tags, 7)))
+
+        article.save()
+
+        redis_client.incr("jobbole_count")
+
+        return
 
 
 class ZhihuQuestionItem(scrapy.Item):
